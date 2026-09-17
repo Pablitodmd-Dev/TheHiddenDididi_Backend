@@ -21,10 +21,25 @@ public class User {
 	private String name;
 
 	@Column(nullable = false, unique = true)
+	private String username;
+
+	@Column(nullable = false, unique = true)
 	private String email;
 
-	@Column(name = "password_hash", nullable = false)
-	private String passwordHash;
+	@Column(name = "password", nullable = false)
+	private String password;
+
+	@Column(nullable = false)
+	private String role = "ROLE_USER";
+
+	@Column(name = "email_verified", nullable = false)
+	private boolean emailVerified = false;
+
+	@Column(name = "verification_token")
+	private String verificationToken;
+
+	@Column(nullable = false)
+	private boolean deleted = false;
 
 	@Column(name = "registration_date", nullable = false, updatable = false)
 	private LocalDateTime registrationDate = LocalDateTime.now();
@@ -48,6 +63,14 @@ public class User {
 		this.name = name;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -56,12 +79,44 @@ public class User {
 		this.email = email;
 	}
 
-	public String getPasswordHash() {
-		return passwordHash;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPasswordHash(String passwordHash) {
-		this.passwordHash = passwordHash;
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public boolean isEmailVerified() {
+		return emailVerified;
+	}
+
+	public void setEmailVerified(boolean emailVerified) {
+		this.emailVerified = emailVerified;
+	}
+
+	public String getVerificationToken() {
+		return verificationToken;
+	}
+
+	public void setVerificationToken(String verificationToken) {
+		this.verificationToken = verificationToken;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	public LocalDateTime getRegistrationDate() {
@@ -71,4 +126,10 @@ public class User {
 	public void setRegistrationDate(LocalDateTime registrationDate) {
 		this.registrationDate = registrationDate;
 	}
+	
+	public Boolean getDeleted() {
+			return deleted;
+	}
+	
+	
 }

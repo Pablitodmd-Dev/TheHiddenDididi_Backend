@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.webthymeleaf.converter.RoundConverter;
 import com.example.webthymeleaf.entity.Round;
 import com.example.webthymeleaf.entity.User;
 import com.example.webthymeleaf.service.RoundService;
@@ -26,6 +27,9 @@ public class RoundController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private RoundConverter roundConverter;
+
 	@PostMapping
 	public ResponseEntity<?> createRound(@RequestBody CreateRoundRequest request,
 			@AuthenticationPrincipal UserDetails principal) {
@@ -34,7 +38,7 @@ public class RoundController {
 					.orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
 
 			Round round = roundService.createRound(hider.getId(), request.getHidingImage());
-			return ResponseEntity.ok(round);
+			return ResponseEntity.ok(roundConverter.entity2dto(round));
 
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
@@ -45,7 +49,8 @@ public class RoundController {
 
 	@GetMapping("/active")
 	public ResponseEntity<?> getActiveRound() {
-		return roundService.getActiveRound().<ResponseEntity<?>>map(ResponseEntity::ok)
+		return roundService.getActiveRound()
+				.<ResponseEntity<?>>map(round -> ResponseEntity.ok(roundConverter.entity2dto(round)))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("No active round right now"));
 	}
 

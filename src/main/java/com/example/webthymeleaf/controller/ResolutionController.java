@@ -1,6 +1,7 @@
 package com.example.webthymeleaf.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.webthymeleaf.converter.ResolutionConverter;
+import com.example.webthymeleaf.model.ResolutionDTO;
 import com.example.webthymeleaf.entity.Resolution;
 import com.example.webthymeleaf.entity.User;
 import com.example.webthymeleaf.service.ResolutionService;
@@ -29,6 +32,9 @@ public class ResolutionController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private ResolutionConverter resolutionConverter;
+
 	@PostMapping
 	public ResponseEntity<?> resolveRound(@RequestBody ResolveRequest request,
 			@AuthenticationPrincipal UserDetails principal) {
@@ -39,7 +45,7 @@ public class ResolutionController {
 			Resolution resolution = resolutionService.resolveRound(
 					request.getRoundId(), user.getId(), request.getProofImage(), request.getComment());
 
-			return ResponseEntity.ok(resolution);
+			return ResponseEntity.ok(resolutionConverter.entity2dto(resolution));
 
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -54,8 +60,11 @@ public class ResolutionController {
 	}
 
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<Resolution>> getResolutionsByUser(@PathVariable Long userId) {
-		return ResponseEntity.ok(resolutionService.getResolutionsByUser(userId));
+	public ResponseEntity<List<ResolutionDTO>> getResolutionsByUser(@PathVariable Long userId) {
+		List<ResolutionDTO> resolutions = resolutionService.getResolutionsByUser(userId).stream()
+				.map(resolutionConverter::entity2dto)
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(resolutions);
 	}
 
 	public static class ResolveRequest {
